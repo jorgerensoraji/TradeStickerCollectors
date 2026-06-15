@@ -836,12 +836,13 @@ function updatePageImage(imageEl, placeholderEl, src) {
 function renderSpreadPageHeader(spread, side) {
   const slots = side === "left" ? spread.leftSlots || [] : spread.rightSlots || [];
   const pageLabel = side === "left" ? "Left page" : "Right page";
+  const groupLabel = spread.code ? `Group ${spread.group}` : spread.group;
   if (!slots.length) {
     return `
       <div class="page-title">
         <span>${escapeHtml(pageLabel)}</span>
         <strong>${escapeHtml(spread.title)}</strong>
-        <small>${escapeHtml(spread.subtitle)}</small>
+        <small>${escapeHtml(groupLabel)}</small>
       </div>
     `;
   }
@@ -853,7 +854,7 @@ function renderSpreadPageHeader(spread, side) {
     <div class="page-title">
       <span>${escapeHtml(pageLabel)}</span>
       <strong>${escapeHtml(spread.title)}</strong>
-      <small>${escapeHtml(spread.subtitle)} - ${rangeText}</small>
+      <small>${escapeHtml(groupLabel)} - ${rangeText}</small>
     </div>
   `;
 }
