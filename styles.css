@@ -1267,6 +1267,19 @@ textarea:focus {
     0 6px 16px rgba(201, 127, 30, 0.24);
 }
 
+.sticker-cell.cover-sticker,
+.catalogue-slot.cover-sticker {
+  aspect-ratio: 130 / 65;
+}
+
+.sticker-cell.cover-sticker {
+  grid-column: span 2;
+}
+
+.catalogue-slot.cover-sticker {
+  width: min(calc(var(--spread-sticker-width) * 1.7), 200px);
+}
+
 .catalogue-slot.placed::after {
   content: "Owned";
   position: absolute;

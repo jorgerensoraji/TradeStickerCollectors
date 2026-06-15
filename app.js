@@ -689,8 +689,9 @@ function renderStickerGrid() {
     const badge = duplicateTotal > 0 ? `<span class="duplicate-badge">+${duplicateTotal}</span>` : "";
     const displayImage = getStickerCopyTotal(sticker) > 0 ? catalog[number] : "";
     const image = displayImage ? `<img src="${displayImage}" alt="Sticker ${number} image" />` : "";
+    const coverClass = number === 1 ? "cover-sticker" : "";
     cells.push(`
-      <button class="sticker-cell ${status}" type="button" data-sticker="${number}" aria-label="${meta.code}, sticker ${number}, ${status}">
+      <button class="sticker-cell ${status} ${coverClass}" type="button" data-sticker="${number}" aria-label="${meta.code}, sticker ${number}, ${status}">
         ${image}
         <span class="sticker-number">${escapeHtml(meta.code)}</span>
         <small>${number}</small>
@@ -804,13 +805,15 @@ function renderSpreadSlots(album, spread, offset) {
     const sticker = album.stickers[number];
     if (!sticker) continue;
     const meta = getStickerMeta(number);
-    const position = getSlotPosition(index, 10);
+    const isCover = number === 1;
+    const position = isCover ? { left: 50, top: 22 } : getSlotPosition(index, 10);
     const ownedClass = getStickerCopyTotal(sticker) > 0 ? "placed" : "";
+    const coverClass = isCover ? "cover-sticker" : "";
     const displayImage = getStickerCopyTotal(sticker) > 0 ? catalog[number] : "";
     const image = displayImage ? `<img src="${displayImage}" alt="${escapeHtml(meta.code)}" />` : "";
     slots.push(`
       <button
-        class="catalogue-slot ${ownedClass}"
+        class="catalogue-slot ${ownedClass} ${coverClass}"
         type="button"
         data-page-sticker="${number}"
         style="left:${position.left}%; top:${position.top}%;"
