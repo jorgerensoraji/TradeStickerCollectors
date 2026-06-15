@@ -1,0 +1,28 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Editors / tools
+.vscode/
+.idea/
+*.iml
+.claude/
+
+# Build / deploy artifacts
+node_modules/
+dist/
+build/
+.cache/
+
+# Env / secrets (none in repo today, but in case any are added later)
+.env
+.env.*
+*.local
+
+# Logs
+*.log
+npm-debug.log*

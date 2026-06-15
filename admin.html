@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | StickerSwap Album</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell">
+      <header class="admin-header">
+        <a class="brand" href="index.html">
+          <div class="brand-mark">SS</div>
+          <div>
+            <strong>StickerSwap</strong>
+            <span>Account administration</span>
+          </div>
+        </a>
+        <div class="auth-actions">
+          <a class="secondary-action" href="index.html">Back to app</a>
+          <button class="secondary-action" type="button" id="adminLogoutBtn">Logout</button>
+        </div>
+      </header>
+
+      <section class="admin-summary" aria-label="Account summary">
+        <article class="stat-pill">
+          <span>Total</span>
+          <strong id="totalUsers">0</strong>
+        </article>
+        <article class="stat-pill">
+          <span>Active</span>
+          <strong id="activeUsers">0</strong>
+        </article>
+        <article class="stat-pill">
+          <span>Disabled</span>
+          <strong id="disabledUsers">0</strong>
+        </article>
+        <article class="stat-pill">
+          <span>Admins</span>
+          <strong id="adminUsers">0</strong>
+        </article>
+      </section>
+
+      <div class="admin-layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">New account</p>
+              <h2>Create user</h2>
+            </div>
+          </div>
+          <form class="admin-form" id="adminCreateForm">
+            <label>
+              Display name
+              <input name="name" type="text" required autocomplete="name" />
+            </label>
+            <label>
+              City
+              <input name="city" type="text" value="Montreal" autocomplete="address-level2" />
+            </label>
+            <label>
+              Email
+              <input name="email" type="email" required autocomplete="email" />
+            </label>
+            <label>
+              Temporary password
+              <input name="password" type="password" required minlength="8" autocomplete="new-password" />
+            </label>
+            <label>
+              Role
+              <select name="role">
+                <option value="collector">Collector</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+            <button type="submit">Create account</button>
+            <p class="form-status" id="adminStatus" role="status"></p>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">People</p>
+              <h2>Manage accounts</h2>
+            </div>
+            <span class="form-status" id="collectorCount">0 collector accounts</span>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel sticker-admin-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Album catalog</p>
+            <h2>Albums available to collectors</h2>
+          </div>
+          <span class="form-status" id="albumCatalogCount">0 albums available</span>
+        </div>
+        <div class="admin-layout">
+          <form class="admin-form" id="albumCatalogForm">
+            <label>
+              Album name
+              <input name="name" type="text" required placeholder="World Cup 2026" />
+            </label>
+            <label>
+              Sticker count
+              <input name="size" type="number" min="1" max="980" value="980" required />
+            </label>
+            <label>
+              Short description (optional)
+              <input name="description" type="text" placeholder="Official 2026 FIFA collection" />
+            </label>
+            <label>
+              Left page image URL (optional)
+              <input name="leftImage" type="url" placeholder="https://..." />
+            </label>
+            <label>
+              Right page image URL (optional)
+              <input name="rightImage" type="url" placeholder="https://..." />
+            </label>
+            <button type="submit">Add to catalog</button>
+            <p class="form-status" id="albumCatalogStatus" role="status"></p>
+          </form>
+          <div class="catalog-admin-grid" id="albumCatalogList" aria-label="Album catalog"></div>
+        </div>
+      </section>
+
+      <section class="panel sticker-admin-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Sticker database</p>
+            <h2>Upload official sticker images</h2>
+          </div>
+          <span class="form-status" id="catalogCount">0 stickers uploaded</span>
+        </div>
+        <div class="admin-layout">
+          <form class="admin-form" id="catalogUploadForm">
+            <label>
+              Sticker reference number
+              <input name="number" type="number" min="1" max="980" required placeholder="Example: 45" />
+            </label>
+            <label>
+              Sticker image
+              <input name="image" type="file" accept="image/*" required />
+            </label>
+            <button type="submit">Upload sticker image</button>
+            <p class="form-status" id="catalogStatus" role="status"></p>
+          </form>
+          <div class="catalog-admin-grid" id="catalogAdminGrid" aria-label="Uploaded sticker images"></div>
+        </div>
+      </section>
+    </main>
+    <script src="auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StickerSwap Album</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark">SS</div>
+          <div>
+            <strong>StickerSwap</strong>
+            <span>Panini collector hub</span>
+          </div>
+        </div>
+
+        <nav class="desktop-nav" aria-label="App sections">
+          <button class="nav-item active" type="button" data-view="home">
+            <span class="nav-icon" aria-hidden="true">HM</span>
+            Home
+          </button>
+          <button class="nav-item" type="button" data-view="album">
+            <span class="nav-icon" aria-hidden="true">AB</span>
+            Albums
+          </button>
+          <button class="nav-item" type="button" data-view="friends">
+            <span class="nav-icon" aria-hidden="true">FR</span>
+            Friends
+          </button>
+          <button class="nav-item" type="button" data-view="chat">
+            <span class="nav-icon" aria-hidden="true">CH</span>
+            Chat
+          </button>
+          <button class="nav-item" type="button" data-view="account">
+            <span class="nav-icon" aria-hidden="true">AC</span>
+            Account
+          </button>
+          <a class="nav-item admin-link" href="admin.html" data-admin-only hidden>
+            <span class="nav-icon" aria-hidden="true">AD</span>
+            Admin
+          </a>
+        </nav>
+
+        <section class="profile-card" aria-label="Collector profile">
+          <div class="avatar" id="profileInitials">JR</div>
+          <div>
+            <strong id="profileName">Jorge R.</strong>
+            <span id="profileMeta">Montreal collector</span>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Collector network</p>
+            <h1 id="viewTitle">Home</h1>
+          </div>
+          <button class="primary-action" type="button" id="newAlbumBtn">
+            <span aria-hidden="true">+</span>
+            Album
+          </button>
+          <div class="auth-actions" aria-label="Account actions">
+            <a class="secondary-action" href="login.html" data-guest-only>Login</a>
+            <a class="secondary-action" href="signup.html" data-guest-only>Sign up</a>
+            <a class="secondary-action" href="admin.html" data-admin-only hidden>Admin</a>
+            <button class="secondary-action" type="button" id="logoutBtn" data-auth-only hidden>Logout</button>
+          </div>
+        </header>
+
+        <section class="view active" id="homeView" aria-labelledby="homeHeading">
+          <div class="home-layout">
+            <section class="feed-layout">
+              <section class="composer panel">
+                <div class="panel-heading">
+                  <div>
+                    <p class="eyebrow">Home</p>
+                    <h2 id="homeHeading">Collector Wall</h2>
+                  </div>
+                  <div class="segmented">
+                    <button class="active" type="button" data-feed-filter="global">Global</button>
+                    <button type="button" data-feed-filter="local">Nearby</button>
+                  </div>
+                </div>
+                <textarea id="postInput" rows="3" placeholder="Looking for ARG 19, BRA 80... I have duplicates to trade."></textarea>
+                <div class="composer-actions">
+                  <input id="cityInput" type="text" value="Montreal" aria-label="City tag" />
+                  <button id="postBtn" type="button">Post</button>
+                </div>
+              </section>
+
+              <div class="post-list" id="postList"></div>
+            </section>
+
+            <aside class="home-rail" aria-label="Home sidebar">
+              <section class="panel">
+                <div class="panel-heading">
+                  <div>
+                    <p class="eyebrow">Today</p>
+                    <h2>Trade Radar</h2>
+                  </div>
+                </div>
+                <div class="radar-list">
+                  <button type="button" data-jump-view="friends">4 friend suggestions</button>
+                  <button type="button" data-jump-view="album">12 duplicates ready</button>
+                  <button type="button" data-jump-view="chat">1 active trade chat</button>
+                </div>
+              </section>
+
+              <section class="panel mini-chat">
+                <div class="panel-heading">
+                  <div>
+                    <p class="eyebrow">Chat</p>
+                    <h2>Ana Lima</h2>
+                  </div>
+                  <button class="text-action" type="button" data-jump-view="chat">Open</button>
+                </div>
+                <div class="mini-message-list" id="miniMessageList" aria-live="polite"></div>
+                <form class="mini-chat-input" id="miniChatForm">
+                  <input id="miniChatInput" type="text" placeholder="Message..." autocomplete="off" />
+                  <button type="submit">Send</button>
+                </form>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="albumView" aria-labelledby="albumHeading">
+          <div class="section-kicker">
+            <p class="eyebrow">Albums and assets</p>
+            <h2>Your collections, inventory, duplicates, and trade material.</h2>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel album-controls">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Inventory</p>
+                  <h2 id="albumHeading">Virtual Album</h2>
+                </div>
+                <select id="albumSelect" aria-label="Select album"></select>
+              </div>
+
+              <div class="stats-row" aria-label="Album stats">
+                <article class="stat-pill">
+                  <span>Owned</span>
+                  <strong id="ownedStat">0</strong>
+                </article>
+                <article class="stat-pill">
+                  <span>Missing</span>
+                  <strong id="missingStat">0</strong>
+                </article>
+                <article class="stat-pill">
+                  <span>Duplicates</span>
+                  <strong id="duplicateStat">0</strong>
+                </article>
+              </div>
+
+              <form class="quick-add" id="quickAddForm">
+                <label for="quickAddInput">Quick Add</label>
+                <div class="quick-add-row">
+                  <input id="quickAddInput" type="text" inputmode="numeric" placeholder="5, 12, 45, 45" autocomplete="off" />
+                  <button type="submit">Add</button>
+                </div>
+                <p id="quickAddHint">Type sticker numbers separated by commas. Repeated numbers become duplicates.</p>
+              </form>
+            </section>
+
+            <section class="panel progress-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Progress</p>
+                  <h2>Completion</h2>
+                </div>
+                <strong id="completionPercent">0%</strong>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+              </div>
+              <div class="legend">
+                <span><i class="dot missing"></i>Falta</span>
+                <span><i class="dot owned"></i>Obtenida</span>
+                <span><i class="dot duplicate"></i>Repetida</span>
+              </div>
+            </section>
+          </div>
+
+          <section class="album-grid-panel" aria-label="Sticker grid">
+            <div class="grid-toolbar">
+              <div>
+                <p class="eyebrow">Sticker Board</p>
+                <h2 id="gridCountLabel">0 stickers</h2>
+              </div>
+              <div class="album-view-tools">
+                <div class="segmented">
+                  <button class="active" type="button" data-album-view="grid">Grid</button>
+                  <button type="button" data-album-view="spread">Album spread</button>
+                </div>
+                <div class="spread-controls" id="spreadControls" hidden>
+                  <button class="spread-nav-btn" type="button" id="prevSpreadBtn" aria-label="Previous spread">Back</button>
+                  <select id="spreadSelect" aria-label="Select album spread"></select>
+                  <button class="spread-nav-btn" type="button" id="nextSpreadBtn" aria-label="Next spread">Next</button>
+                </div>
+                <div class="sticker-search-box">
+                  <input id="stickerSearch" type="search" placeholder="Search number, code, team..." aria-label="Search stickers" autocomplete="off" />
+                  <div class="sticker-search-results" id="stickerSearchResults" hidden></div>
+                </div>
+              </div>
+            </div>
+            <div class="sticker-grid" id="stickerGrid"></div>
+            <div class="catalogue-view" id="catalogueView" hidden>
+              <article class="catalogue-page" id="cataloguePageOne">
+                <img id="pageOneImage" alt="Album left page" />
+                <div class="page-placeholder" id="pageOnePlaceholder">Left album page</div>
+                <div class="catalogue-slots" id="pageOneSlots"></div>
+              </article>
+              <article class="catalogue-page" id="cataloguePageTwo">
+                <img id="pageTwoImage" alt="Album right page" />
+                <div class="page-placeholder" id="pageTwoPlaceholder">Right album page</div>
+                <div class="catalogue-slots" id="pageTwoSlots"></div>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="friendsView" aria-labelledby="friendsHeading">
+          <div class="friends-layout">
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Network</p>
+                  <h2 id="friendsHeading">Friends</h2>
+                </div>
+              </div>
+              <div class="friend-list" id="friendList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Discover</p>
+                  <h2>Add Friends</h2>
+                </div>
+              </div>
+              <div class="suggestion-list" id="suggestionList"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="chatView" aria-labelledby="chatHeading">
+          <div class="chat-layout">
+            <aside class="chat-list panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Messages</p>
+                  <h2 id="chatHeading">Trades</h2>
+                </div>
+              </div>
+              <button class="contact active" type="button">
+                <span class="avatar small">AL</span>
+                <span>
+                  <strong>Ana Lima</strong>
+                  <small>Needs your dupes</small>
+                </span>
+              </button>
+              <button class="contact" type="button">
+                <span class="avatar small">MC</span>
+                <span>
+                  <strong>Marco C.</strong>
+                  <small>Nearby collector</small>
+                </span>
+              </button>
+            </aside>
+
+            <section class="chat-panel panel">
+              <div class="chat-header">
+                <div class="avatar">AL</div>
+                <div>
+                  <strong>Ana Lima</strong>
+                  <span>Online - Montreal</span>
+                </div>
+              </div>
+
+              <div class="message-list" id="messageList" aria-live="polite"></div>
+
+              <div class="trade-actions">
+                <button id="compareBtn" type="button">Compare & Match</button>
+                <button id="confirmTradeBtn" type="button" disabled>Confirm Trade</button>
+              </div>
+
+              <form class="chat-input" id="chatForm">
+                <input id="chatInput" type="text" placeholder="Write a message..." autocomplete="off" />
+                <button type="submit">Send</button>
+              </form>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="accountView" aria-labelledby="accountHeading">
+          <div class="account-layout">
+            <section class="panel account-hero">
+              <div class="avatar large">JR</div>
+              <div>
+                <p class="eyebrow">Account</p>
+                <h2 id="accountHeading">Jorge R.</h2>
+                <p id="accountSummary">Montreal collector focused on World Cup 2026 trades.</p>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Profile</p>
+                  <h2>Collector Details</h2>
+                </div>
+              </div>
+              <div class="settings-grid">
+                <label>
+                  Display name
+                  <input id="accountNameInput" type="text" value="Jorge R." />
+                </label>
+                <label>
+                  City
+                  <input id="accountCityInput" type="text" value="Montreal" />
+                </label>
+                <label>
+                  Email
+                  <input id="accountEmailInput" type="email" value="jorge@example.com" disabled />
+                </label>
+                <label>
+                  Preferred language
+                  <select id="accountLanguageInput">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                  </select>
+                </label>
+                <label>
+                  Trade visibility
+                  <select id="accountVisibilityInput">
+                    <option>Friends and nearby collectors</option>
+                    <option>Friends only</option>
+                    <option>Global</option>
+                  </select>
+                </label>
+              </div>
+              <div class="settings-actions">
+                <button class="primary-action" type="button" id="saveAccountBtn">Save profile</button>
+                <p class="form-status" id="accountStatus" role="status"></p>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <aside class="messenger-rail" aria-label="Chat contacts">
+        <div class="messenger-rail-header">
+          <strong>Chats</strong>
+          <button class="text-action" type="button" data-view="chat">All</button>
+        </div>
+        <div class="messenger-contact-list" id="messengerContactList"></div>
+      </aside>
+
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <button class="nav-item active" type="button" data-view="home">
+          <span class="nav-icon" aria-hidden="true">HM</span>
+          Home
+        </button>
+        <button class="nav-item" type="button" data-view="album">
+          <span class="nav-icon" aria-hidden="true">AB</span>
+          Albums
+        </button>
+        <button class="nav-item" type="button" data-view="friends">
+          <span class="nav-icon" aria-hidden="true">FR</span>
+          Friends
+        </button>
+        <button class="nav-item" type="button" data-view="chat">
+          <span class="nav-icon" aria-hidden="true">CH</span>
+          Chat
+        </button>
+        <button class="nav-item" type="button" data-view="account">
+          <span class="nav-icon" aria-hidden="true">AC</span>
+          Account
+        </button>
+        <a class="nav-item admin-link" href="admin.html" data-admin-only hidden>
+          <span class="nav-icon" aria-hidden="true">AD</span>
+          Admin
+        </a>
+      </nav>
+
+      <section class="messenger-dock" id="messengerDock" aria-label="Floating chat">
+        <button class="messenger-fab" id="messengerFab" type="button" aria-label="Open chats">
+          <span id="messengerFabInitials">CH</span>
+        </button>
+
+        <article class="messenger-window" id="messengerWindow" aria-live="polite">
+          <header class="messenger-window-header">
+            <button class="messenger-person" id="messengerPersonBtn" type="button">
+              <span class="avatar small" id="messengerAvatar">AL</span>
+              <span>
+                <strong id="messengerName">Ana Lima</strong>
+                <small id="messengerStatus">Online - Montreal</small>
+              </span>
+            </button>
+            <button class="icon-button" id="messengerCloseBtn" type="button" aria-label="Close chat">x</button>
+          </header>
+          <div class="messenger-messages" id="messengerMessages"></div>
+          <form class="messenger-input" id="messengerForm">
+            <input id="messengerInput" type="text" placeholder="Message..." autocomplete="off" />
+            <button type="submit">Send</button>
+          </form>
+        </article>
+      </section>
+    </div>
+
+    <dialog id="albumDialog">
+      <form method="dialog" class="dialog-card" id="albumForm">
+        <div>
+          <p class="eyebrow">Album catalog</p>
+          <h2>Add an album</h2>
+          <p class="form-status">Pick an album to add to your collection. New albums are published by the administrator.</p>
+        </div>
+        <div class="album-catalog-list" id="albumCatalogPicker" aria-label="Available albums"></div>
+        <p class="form-status" id="albumPickerStatus" role="status"></p>
+        <div class="dialog-actions">
+          <button value="cancel" type="button" id="cancelAlbumBtn">Close</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="stickerDialog">
+      <form method="dialog" class="dialog-card sticker-dialog-card" id="stickerImageForm">
+        <div>
+          <p class="eyebrow">Sticker database preview</p>
+          <h2 id="stickerDialogTitle">Sticker #</h2>
+        </div>
+        <div class="sticker-preview" id="stickerPreview">
+          <span>No image yet</span>
+        </div>
+        <label class="sticker-mark-field">
+          Mark color
+          <select id="stickerVariantSelect">
+            <option value="white">White mark</option>
+            <option value="red">Red mark</option>
+            <option value="green">Green mark</option>
+            <option value="purple">Purple mark</option>
+            <option value="black">Black mark</option>
+          </select>
+        </label>
+        <p class="form-status" id="stickerDialogStatus" role="status"></p>
+        <div class="dialog-actions">
+          <button type="button" id="markStickerOwnedBtn">Mark owned</button>
+          <button type="button" id="addStickerDuplicateBtn">Add duplicate</button>
+          <button type="button" id="removeStickerDuplicateBtn">Remove duplicate</button>
+          <button type="button" id="clearStickerDuplicatesBtn">Clear duplicates</button>
+          <button type="button" id="markStickerMissingBtn">Mark missing</button>
+          <button value="cancel" type="button" id="closeStickerDialogBtn">Close</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

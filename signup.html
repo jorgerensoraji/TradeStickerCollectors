@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account | StickerSwap Album</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-page">
+    <main class="auth-shell">
+      <header class="auth-header">
+        <a class="brand" href="index.html">
+          <div class="brand-mark">SS</div>
+          <div>
+            <strong>StickerSwap</strong>
+            <span>Panini collector hub</span>
+          </div>
+        </a>
+        <a class="secondary-action" href="login.html">Login</a>
+      </header>
+
+      <section class="auth-panel">
+        <p class="eyebrow">Collector account</p>
+        <h1>Create account</h1>
+        <form id="signupForm">
+          <label>
+            Display name
+            <input name="name" type="text" required autocomplete="name" />
+          </label>
+          <label>
+            City
+            <input name="city" type="text" value="Montreal" autocomplete="address-level2" />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required autocomplete="email" />
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" required minlength="8" autocomplete="new-password" />
+          </label>
+          <button type="submit">Create account</button>
+          <p class="form-status" id="signupStatus" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <script src="auth.js"></script>
+  </body>
+</html>
