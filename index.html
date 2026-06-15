@@ -22,19 +22,19 @@
             <span class="nav-icon" aria-hidden="true">HM</span>
             Home
           </button>
-          <button class="nav-item" type="button" data-view="album">
+          <button class="nav-item" type="button" data-view="album" data-auth-only hidden>
             <span class="nav-icon" aria-hidden="true">AB</span>
             Albums
           </button>
-          <button class="nav-item" type="button" data-view="friends">
+          <button class="nav-item" type="button" data-view="friends" data-auth-only hidden>
             <span class="nav-icon" aria-hidden="true">FR</span>
             Friends
           </button>
-          <button class="nav-item" type="button" data-view="chat">
+          <button class="nav-item" type="button" data-view="chat" data-auth-only hidden>
             <span class="nav-icon" aria-hidden="true">CH</span>
             Chat
           </button>
-          <button class="nav-item" type="button" data-view="account">
+          <button class="nav-item" type="button" data-view="account" data-auth-only hidden>
             <span class="nav-icon" aria-hidden="true">AC</span>
             Account
           </button>
@@ -44,7 +44,7 @@
           </a>
         </nav>
 
-        <section class="profile-card" aria-label="Collector profile">
+        <section class="profile-card" aria-label="Collector profile" data-auth-only hidden>
           <div class="avatar" id="profileInitials">JR</div>
           <div>
             <strong id="profileName">Jorge R.</strong>
@@ -59,7 +59,7 @@
             <p class="eyebrow">Collector network</p>
             <h1 id="viewTitle">Home</h1>
           </div>
-          <button class="primary-action" type="button" id="newAlbumBtn">
+          <button class="primary-action" type="button" id="newAlbumBtn" data-auth-only hidden>
             <span aria-hidden="true">+</span>
             Album
           </button>
@@ -72,13 +72,24 @@
         </header>
 
         <section class="view active" id="homeView" aria-labelledby="homeHeading">
+          <section class="panel guest-welcome" data-guest-only>
+            <div>
+              <p class="eyebrow">Welcome</p>
+              <h2 id="homeHeading">Collector Wall</h2>
+              <p>Browse the latest trade requests from collectors. Log in or create an account to post, chat, and start your own album.</p>
+            </div>
+            <div class="auth-actions">
+              <a class="primary-action" href="signup.html">Create account</a>
+              <a class="secondary-action" href="login.html">Login</a>
+            </div>
+          </section>
           <div class="home-layout">
             <section class="feed-layout">
-              <section class="composer panel">
+              <section class="composer panel" data-auth-only hidden>
                 <div class="panel-heading">
                   <div>
                     <p class="eyebrow">Home</p>
-                    <h2 id="homeHeading">Collector Wall</h2>
+                    <h2>Share a trade</h2>
                   </div>
                   <div class="segmented">
                     <button class="active" type="button" data-feed-filter="global">Global</button>
@@ -95,7 +106,7 @@
               <div class="post-list" id="postList"></div>
             </section>
 
-            <aside class="home-rail" aria-label="Home sidebar">
+            <aside class="home-rail" aria-label="Home sidebar" data-auth-only hidden>
               <section class="panel">
                 <div class="panel-heading">
                   <div>
@@ -128,7 +139,7 @@
           </div>
         </section>
 
-        <section class="view" id="albumView" aria-labelledby="albumHeading">
+        <section class="view" id="albumView" aria-labelledby="albumHeading" data-auth-only hidden>
           <div class="section-kicker">
             <p class="eyebrow">Albums and assets</p>
             <h2>Your collections, inventory, duplicates, and trade material.</h2>
@@ -225,7 +236,7 @@
           </section>
         </section>
 
-        <section class="view" id="friendsView" aria-labelledby="friendsHeading">
+        <section class="view" id="friendsView" aria-labelledby="friendsHeading" data-auth-only hidden>
           <div class="friends-layout">
             <section class="panel">
               <div class="panel-heading">
@@ -249,7 +260,7 @@
           </div>
         </section>
 
-        <section class="view" id="chatView" aria-labelledby="chatHeading">
+        <section class="view" id="chatView" aria-labelledby="chatHeading" data-auth-only hidden>
           <div class="chat-layout">
             <aside class="chat-list panel">
               <div class="panel-heading">
@@ -298,7 +309,7 @@
           </div>
         </section>
 
-        <section class="view" id="accountView" aria-labelledby="accountHeading">
+        <section class="view" id="accountView" aria-labelledby="accountHeading" data-auth-only hidden>
           <div class="account-layout">
             <section class="panel account-hero">
               <div class="avatar large">JR</div>
@@ -355,7 +366,7 @@
         </section>
       </main>
 
-      <aside class="messenger-rail" aria-label="Chat contacts">
+      <aside class="messenger-rail" aria-label="Chat contacts" data-auth-only hidden>
         <div class="messenger-rail-header">
           <strong>Chats</strong>
           <button class="text-action" type="button" data-view="chat">All</button>
@@ -368,19 +379,19 @@
           <span class="nav-icon" aria-hidden="true">HM</span>
           Home
         </button>
-        <button class="nav-item" type="button" data-view="album">
+        <button class="nav-item" type="button" data-view="album" data-auth-only hidden>
           <span class="nav-icon" aria-hidden="true">AB</span>
           Albums
         </button>
-        <button class="nav-item" type="button" data-view="friends">
+        <button class="nav-item" type="button" data-view="friends" data-auth-only hidden>
           <span class="nav-icon" aria-hidden="true">FR</span>
           Friends
         </button>
-        <button class="nav-item" type="button" data-view="chat">
+        <button class="nav-item" type="button" data-view="chat" data-auth-only hidden>
           <span class="nav-icon" aria-hidden="true">CH</span>
           Chat
         </button>
-        <button class="nav-item" type="button" data-view="account">
+        <button class="nav-item" type="button" data-view="account" data-auth-only hidden>
           <span class="nav-icon" aria-hidden="true">AC</span>
           Account
         </button>
@@ -390,7 +401,7 @@
         </a>
       </nav>
 
-      <section class="messenger-dock" id="messengerDock" aria-label="Floating chat">
+      <section class="messenger-dock" id="messengerDock" aria-label="Floating chat" data-auth-only hidden>
         <button class="messenger-fab" id="messengerFab" type="button" aria-label="Open chats">
           <span id="messengerFabInitials">CH</span>
         </button>

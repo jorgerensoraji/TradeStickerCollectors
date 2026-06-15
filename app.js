@@ -617,14 +617,8 @@ function updateAuthUI() {
   });
 
   if (!user) {
-    fillAccountView({
-      name: "Jorge R.",
-      email: "jorge@example.com",
-      city: "Montreal",
-      language: "English",
-      visibility: "Friends and nearby collectors",
-      role: "collector",
-    });
+    const active = document.querySelector(".view.active");
+    if (!active || active.id !== "homeView") switchView("home");
     return;
   }
 
@@ -985,8 +979,13 @@ function quickAdd(rawValue) {
 }
 
 function switchView(viewName) {
+  const authOnlyViews = new Set(["album", "friends", "chat", "account"]);
+  if (authOnlyViews.has(viewName) && !getSessionUser()) {
+    viewName = "home";
+  }
   document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
-  document.querySelector(`#${viewName}View`).classList.add("active");
+  const target = document.querySelector(`#${viewName}View`);
+  if (target) target.classList.add("active");
   els.navItems.forEach((item) => item.classList.toggle("active", item.dataset.view === viewName));
 
   const titles = {
@@ -996,7 +995,7 @@ function switchView(viewName) {
     chat: "Trade Chat",
     account: "Account",
   };
-  els.viewTitle.textContent = titles[viewName];
+  els.viewTitle.textContent = titles[viewName] || "Home";
 }
 
 function renderPosts() {
@@ -1022,12 +1021,14 @@ function renderPosts() {
 }
 
 function addPost() {
+  const user = getSessionUser();
+  if (!user) return;
   const text = els.postInput.value.trim();
   if (!text) return;
 
   state.posts.unshift({
     id: crypto.randomUUID(),
-    author: getSessionUser()?.name || "Guest Collector",
+    author: user.name,
     city: els.cityInput.value.trim() || "Local",
     text,
     likes: 0,
@@ -1513,6 +1514,7 @@ els.postBtn.addEventListener("click", addPost);
 els.postList.addEventListener("click", (event) => {
   const likeButton = event.target.closest("[data-like]");
   if (!likeButton) return;
+  if (!getSessionUser()) return;
   const post = state.posts.find((item) => item.id === likeButton.dataset.like);
   if (!post) return;
   post.likes += 1;

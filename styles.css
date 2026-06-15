@@ -2234,6 +2234,42 @@ dialog::backdrop {
   padding-right: 4px;
 }
 
+.guest-welcome {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.guest-welcome h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  letter-spacing: -0.025em;
+  color: var(--text-strong);
+  margin-bottom: 6px;
+}
+
+.guest-welcome p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 560px;
+}
+
+.guest-welcome .auth-actions {
+  justify-content: flex-start;
+}
+
+.home-layout:has(> aside[hidden]) {
+  grid-template-columns: 1fr;
+}
+
+.guest-welcome a.primary-action,
+.guest-welcome a.secondary-action {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 .catalog-admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
