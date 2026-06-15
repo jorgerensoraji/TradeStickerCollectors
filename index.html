@@ -125,7 +125,7 @@
                 <div class="panel-heading">
                   <div>
                     <p class="eyebrow">Chat</p>
-                    <h2>Ana Lima</h2>
+                    <h2 id="miniChatName">Recent</h2>
                   </div>
                   <button class="text-action" type="button" data-jump-view="chat">Open</button>
                 </div>
@@ -269,28 +269,16 @@
                   <h2 id="chatHeading">Trades</h2>
                 </div>
               </div>
-              <button class="contact active" type="button">
-                <span class="avatar small">AL</span>
-                <span>
-                  <strong>Ana Lima</strong>
-                  <small>Needs your dupes</small>
-                </span>
-              </button>
-              <button class="contact" type="button">
-                <span class="avatar small">MC</span>
-                <span>
-                  <strong>Marco C.</strong>
-                  <small>Nearby collector</small>
-                </span>
-              </button>
+              <div id="chatContactList"></div>
+              <p class="form-status" id="chatEmptyState">No conversations yet. Add a friend to start trading.</p>
             </aside>
 
             <section class="chat-panel panel">
               <div class="chat-header">
-                <div class="avatar">AL</div>
+                <div class="avatar" id="chatHeaderAvatar">--</div>
                 <div>
-                  <strong>Ana Lima</strong>
-                  <span>Online - Montreal</span>
+                  <strong id="chatHeaderName">Pick a conversation</strong>
+                  <span id="chatHeaderStatus">No friends added yet</span>
                 </div>
               </div>
 

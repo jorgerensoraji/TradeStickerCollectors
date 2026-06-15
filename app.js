@@ -100,7 +100,7 @@ const sampleAlbums = [
     size: WORLD_CUP_SIZE,
     pageImages: ["", ""],
     template: "world-cup-2026",
-    stickers: seedStickers(WORLD_CUP_SIZE, [1, 5, 12, 18, 22, 45, 45, 66, 80, 80, 80, 99]),
+    stickers: seedStickers(WORLD_CUP_SIZE, []),
   },
 ];
 
@@ -288,40 +288,10 @@ function loadState() {
 
   return {
     albums: sampleAlbums,
-    posts: [
-      {
-        id: crypto.randomUUID(),
-        author: "Ana Lima",
-        city: "Montreal",
-        text: "Trading today near downtown. I need 5, 18 and 80. I have several Brazil duplicates.",
-        likes: 8,
-        comments: 3,
-        local: true,
-      },
-      {
-        id: crypto.randomUUID(),
-        author: "Luis P.",
-        city: "Lima",
-        text: "Just opened a fresh box. Looking for serious album collectors for weekend trades.",
-        likes: 15,
-        comments: 6,
-        local: false,
-      },
-    ],
-    messages: [
-      { id: crypto.randomUUID(), from: "them", text: "Hey! Want to compare our World Cup album duplicates?" },
-      { id: crypto.randomUUID(), from: "me", text: "Yes, I just updated mine." },
-    ],
-    friends: [
-      { id: crypto.randomUUID(), name: "Ana Lima", city: "Montreal", status: "Friend", initials: "AL", trades: 3 },
-      { id: crypto.randomUUID(), name: "Marco C.", city: "Montreal", status: "Friend", initials: "MC", trades: 1 },
-    ],
-    suggestions: [
-      { id: crypto.randomUUID(), name: "Camila Reyes", city: "Montreal", initials: "CR", reason: "Has 9 stickers you need" },
-      { id: crypto.randomUUID(), name: "Luis P.", city: "Lima", initials: "LP", reason: "Collects World Cup 2026" },
-      { id: crypto.randomUUID(), name: "Sofia N.", city: "Toronto", initials: "SN", reason: "Nearby weekend trader" },
-      { id: crypto.randomUUID(), name: "Diego M.", city: "Montreal", initials: "DM", reason: "Many duplicate defenders" },
-    ],
+    posts: [],
+    messages: [],
+    friends: [],
+    suggestions: [],
   };
 }
 
@@ -344,20 +314,10 @@ function normalizeState(nextState) {
       normalizeStickerVariants(album.stickers[number]);
     }
   });
-  nextState.posts = nextState.posts || [];
-  nextState.messages = nextState.messages || [];
-  nextState.friends =
-    nextState.friends || [
-      { id: crypto.randomUUID(), name: "Ana Lima", city: "Montreal", status: "Friend", initials: "AL", trades: 3 },
-      { id: crypto.randomUUID(), name: "Marco C.", city: "Montreal", status: "Friend", initials: "MC", trades: 1 },
-    ];
-  nextState.suggestions =
-    nextState.suggestions || [
-      { id: crypto.randomUUID(), name: "Camila Reyes", city: "Montreal", initials: "CR", reason: "Has 9 stickers you need" },
-      { id: crypto.randomUUID(), name: "Luis P.", city: "Lima", initials: "LP", reason: "Collects World Cup 2026" },
-      { id: crypto.randomUUID(), name: "Sofia N.", city: "Toronto", initials: "SN", reason: "Nearby weekend trader" },
-      { id: crypto.randomUUID(), name: "Diego M.", city: "Montreal", initials: "DM", reason: "Many duplicate defenders" },
-    ];
+  nextState.posts = Array.isArray(nextState.posts) ? nextState.posts : [];
+  nextState.messages = Array.isArray(nextState.messages) ? nextState.messages : [];
+  nextState.friends = Array.isArray(nextState.friends) ? nextState.friends : [];
+  nextState.suggestions = Array.isArray(nextState.suggestions) ? nextState.suggestions : [];
   return nextState;
 }
 
@@ -1000,6 +960,11 @@ function switchView(viewName) {
 
 function renderPosts() {
   const posts = state.posts.filter((post) => activeFeedFilter === "global" || post.local);
+  if (posts.length === 0) {
+    els.postList.innerHTML =
+      '<p class="form-status post-empty">No trade posts yet. Be the first to share what you need or have to trade.</p>';
+    return;
+  }
   els.postList.innerHTML = posts
     .map(
       (post) => `
@@ -1232,35 +1197,39 @@ function addAlbumFromCatalog(catalogId) {
 }
 
 function renderFriends() {
-  els.friendList.innerHTML = state.friends
-    .map(
-      (friend) => `
-        <article class="friend-card">
-          <span class="avatar small">${escapeHtml(friend.initials)}</span>
-          <div>
-            <strong>${escapeHtml(friend.name)}</strong>
-            <small>${escapeHtml(friend.city)} - ${escapeHtml(friend.status)} - ${friend.trades} trade${friend.trades === 1 ? "" : "s"}</small>
-          </div>
-          <button type="button" data-chat-friend="${friend.id}">Message</button>
-        </article>
-      `,
-    )
-    .join("");
+  els.friendList.innerHTML = state.friends.length
+    ? state.friends
+        .map(
+          (friend) => `
+            <article class="friend-card">
+              <span class="avatar small">${escapeHtml(friend.initials)}</span>
+              <div>
+                <strong>${escapeHtml(friend.name)}</strong>
+                <small>${escapeHtml(friend.city)} - ${escapeHtml(friend.status)} - ${friend.trades} trade${friend.trades === 1 ? "" : "s"}</small>
+              </div>
+              <button type="button" data-chat-friend="${friend.id}">Message</button>
+            </article>
+          `,
+        )
+        .join("")
+    : '<p class="form-status">No friends yet. Add collectors from the suggestions on the right.</p>';
 
-  els.suggestionList.innerHTML = state.suggestions
-    .map(
-      (person) => `
-        <article class="friend-card">
-          <span class="avatar small">${escapeHtml(person.initials)}</span>
-          <div>
-            <strong>${escapeHtml(person.name)}</strong>
-            <small>${escapeHtml(person.city)} - ${escapeHtml(person.reason)}</small>
-          </div>
-          <button type="button" data-add-friend="${person.id}">Add</button>
-        </article>
-      `,
-    )
-    .join("");
+  els.suggestionList.innerHTML = state.suggestions.length
+    ? state.suggestions
+        .map(
+          (person) => `
+            <article class="friend-card">
+              <span class="avatar small">${escapeHtml(person.initials)}</span>
+              <div>
+                <strong>${escapeHtml(person.name)}</strong>
+                <small>${escapeHtml(person.city)} - ${escapeHtml(person.reason)}</small>
+              </div>
+              <button type="button" data-add-friend="${person.id}">Add</button>
+            </article>
+          `,
+        )
+        .join("")
+    : '<p class="form-status">No suggestions available yet.</p>';
   renderMessengerContacts();
 }
 
@@ -1287,6 +1256,10 @@ function renderMessengerContacts() {
 
 function renderMessenger() {
   const person = getActiveChatPerson();
+  const hasContacts = state.friends.length > 0 || state.suggestions.length > 0;
+  if (els.messengerDock && getSessionUser()) {
+    els.messengerDock.hidden = !hasContacts;
+  }
   if (!person) return;
 
   els.messengerDock.classList.toggle("open", isMessengerOpen);
