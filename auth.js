@@ -360,19 +360,51 @@ function bindAdmin() {
     const data = new FormData(catalogForm);
     const number = Number.parseInt(data.get("number"), 10);
     const file = data.get("image");
+    const MAX_BYTES = 800 * 1024;
     if (!Number.isInteger(number) || number < 1) {
       setStatus("catalogStatus", "Enter a valid sticker reference number.", true);
       return;
     }
-    if (!file || !file.type?.startsWith("image/")) {
+    if (!file || !(file instanceof File) || !file.type?.startsWith("image/")) {
       setStatus("catalogStatus", "Choose an image file.", true);
       return;
     }
+    if (file.size > MAX_BYTES) {
+      setStatus(
+        "catalogStatus",
+        `Image is too large (${Math.round(file.size / 1024)} KB). Keep it under 800 KB so the browser can store it.`,
+        true,
+      );
+      return;
+    }
     const reader = new FileReader();
+    reader.addEventListener("error", () => {
+      setStatus("catalogStatus", "Could not read the image file. Try a different file.", true);
+    });
     reader.addEventListener("load", () => {
+      const dataUrl = String(reader.result || "");
       const catalog = getCatalog();
-      catalog[number] = String(reader.result || "");
-      saveCatalog(catalog);
+      const previousValue = catalog[number];
+      catalog[number] = dataUrl;
+      try {
+        saveCatalog(catalog);
+      } catch (error) {
+        if (previousValue === undefined) {
+          delete catalog[number];
+        } else {
+          catalog[number] = previousValue;
+        }
+        const isQuota =
+          error && (error.name === "QuotaExceededError" || error.code === 22 || /quota/i.test(error.message || ""));
+        setStatus(
+          "catalogStatus",
+          isQuota
+            ? "Browser storage is full. Remove unused sticker images first, or use a smaller file."
+            : `Could not save: ${error.message || error}`,
+          true,
+        );
+        return;
+      }
       catalogForm.reset();
       setStatus("catalogStatus", `Sticker #${number} image saved.`);
       renderCatalogAdmin();
