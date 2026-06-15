@@ -696,7 +696,7 @@ function renderSpreadOptions() {
       label = `${spread.title} - ${spread.subtitle}`;
     } else {
       teamCounter += 1;
-      label = `${String(teamCounter).padStart(2, "0")} ${spread.title} (${spread.start}-${spread.end})`;
+      label = `${String(teamCounter).padStart(2, "0")} ${spread.title} (${spread.code}1-${spread.code}20)`;
     }
     return `<option value="${index}">${escapeHtml(label)}</option>`;
   }).join("");
@@ -846,9 +846,9 @@ function renderSpreadPageHeader(spread, side) {
     `;
   }
   const numbers = slots.map((slot) => slot.number);
-  const rangeStart = Math.min(...numbers);
-  const rangeEnd = Math.max(...numbers);
-  const rangeText = rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}-${rangeEnd}`;
+  const first = Math.min(...numbers);
+  const last = Math.max(...numbers);
+  const rangeText = getSpreadRangeText(spread, first, last);
   return `
     <div class="page-title">
       <span>${escapeHtml(pageLabel)}</span>
@@ -856,6 +856,20 @@ function renderSpreadPageHeader(spread, side) {
       <small>${escapeHtml(spread.subtitle)} - ${rangeText}</small>
     </div>
   `;
+}
+
+function getSpreadRangeText(spread, first, last) {
+  if (spread.code) {
+    const firstLocal = first - spread.start + 1;
+    const lastLocal = last - spread.start + 1;
+    return firstLocal === lastLocal
+      ? `${spread.code}${firstLocal}`
+      : `${spread.code}${firstLocal}-${spread.code}${lastLocal}`;
+  }
+  if (first === 1) {
+    return last === 1 ? "#00" : `#00-FWC${last - 1}`;
+  }
+  return first === last ? `FWC${first - 1}` : `FWC${first - 1}-FWC${last - 1}`;
 }
 
 function renderSpreadSlots(album, spread, side) {
