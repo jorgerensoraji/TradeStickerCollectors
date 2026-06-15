@@ -70,8 +70,51 @@ const WORLD_CUP_TEAMS = [
   ["L", "Panama", "PAN", 961],
 ];
 
+const INTRO_SPREADS = [
+  {
+    id: "intro-01",
+    title: "FIFA Museum",
+    subtitle: "Page 1-2 - #00, FWC1-FWC4",
+    start: 1,
+    end: 5,
+    group: "Opening",
+    leftSlots: [{ number: 1, layout: "cover" }],
+    rightSlots: [{ number: 2 }, { number: 3 }, { number: 4 }, { number: 5 }],
+  },
+  {
+    id: "intro-02",
+    title: "FIFA Museum",
+    subtitle: "Page 3-4 - FWC5-FWC11",
+    start: 6,
+    end: 12,
+    group: "Opening",
+    leftSlots: [{ number: 6 }, { number: 7 }, { number: 8 }, { number: 9 }],
+    rightSlots: [{ number: 10 }, { number: 11 }, { number: 12 }],
+  },
+  {
+    id: "intro-03",
+    title: "FIFA Museum",
+    subtitle: "Page 5-6 - FWC12-FWC17",
+    start: 13,
+    end: 18,
+    group: "Opening",
+    leftSlots: [{ number: 13 }, { number: 14 }, { number: 15 }],
+    rightSlots: [{ number: 16 }, { number: 17 }, { number: 18 }],
+  },
+  {
+    id: "intro-04",
+    title: "FIFA Museum",
+    subtitle: "Page 7 - FWC18-FWC19",
+    start: 19,
+    end: 20,
+    group: "Opening",
+    leftSlots: [{ number: 19 }, { number: 20 }],
+    rightSlots: [],
+  },
+];
+
 const WORLD_CUP_SPREADS = [
-  { id: "opening", title: "Opening + FIFA Museum", subtitle: "#00, FWC1-FWC19", start: 1, end: 20, group: "Opening" },
+  ...INTRO_SPREADS,
   ...WORLD_CUP_TEAMS.map(([group, name, code, start], index) => ({
     id: code,
     title: name,
@@ -81,6 +124,8 @@ const WORLD_CUP_SPREADS = [
     code,
     group,
     spread: index + 1,
+    leftSlots: Array.from({ length: 10 }, (_, i) => ({ number: start + i })),
+    rightSlots: Array.from({ length: 10 }, (_, i) => ({ number: start + 10 + i })),
   })),
 ];
 
@@ -644,10 +689,15 @@ function renderAlbumOptions() {
 
 function renderSpreadOptions() {
   if (!els.spreadSelect) return;
+  let teamCounter = 0;
   els.spreadSelect.innerHTML = WORLD_CUP_SPREADS.map((spread, index) => {
-    const label = index === 0
-      ? `Opening - ${spread.start}-${spread.end}`
-      : `${String(index).padStart(2, "0")} ${spread.title} (${spread.start}-${spread.end})`;
+    let label;
+    if (spread.group === "Opening") {
+      label = `${spread.title} - ${spread.subtitle}`;
+    } else {
+      teamCounter += 1;
+      label = `${String(teamCounter).padStart(2, "0")} ${spread.title} (${spread.start}-${spread.end})`;
+    }
     return `<option value="${index}">${escapeHtml(label)}</option>`;
   }).join("");
   els.spreadSelect.value = String(activeSpreadIndex);
@@ -770,8 +820,8 @@ function renderCatalogue() {
 
   els.pageOnePlaceholder.innerHTML = renderSpreadPageHeader(spread, "left");
   els.pageTwoPlaceholder.innerHTML = renderSpreadPageHeader(spread, "right");
-  els.pageOneSlots.innerHTML = renderSpreadSlots(album, spread, 0);
-  els.pageTwoSlots.innerHTML = renderSpreadSlots(album, spread, 10);
+  els.pageOneSlots.innerHTML = renderSpreadSlots(album, spread, "left");
+  els.pageTwoSlots.innerHTML = renderSpreadSlots(album, spread, "right");
 }
 
 function updatePageImage(imageEl, placeholderEl, src) {
@@ -784,29 +834,45 @@ function updatePageImage(imageEl, placeholderEl, src) {
 }
 
 function renderSpreadPageHeader(spread, side) {
-  const rangeStart = side === "left" ? spread.start : spread.start + 10;
-  const rangeEnd = side === "left" ? spread.start + 9 : spread.end;
+  const slots = side === "left" ? spread.leftSlots || [] : spread.rightSlots || [];
   const pageLabel = side === "left" ? "Left page" : "Right page";
+  if (!slots.length) {
+    return `
+      <div class="page-title">
+        <span>${escapeHtml(pageLabel)}</span>
+        <strong>${escapeHtml(spread.title)}</strong>
+        <small>${escapeHtml(spread.subtitle)}</small>
+      </div>
+    `;
+  }
+  const numbers = slots.map((slot) => slot.number);
+  const rangeStart = Math.min(...numbers);
+  const rangeEnd = Math.max(...numbers);
+  const rangeText = rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}-${rangeEnd}`;
   return `
     <div class="page-title">
       <span>${escapeHtml(pageLabel)}</span>
       <strong>${escapeHtml(spread.title)}</strong>
-      <small>${escapeHtml(spread.subtitle)} - ${rangeStart}-${rangeEnd}</small>
+      <small>${escapeHtml(spread.subtitle)} - ${rangeText}</small>
     </div>
   `;
 }
 
-function renderSpreadSlots(album, spread, offset) {
+function renderSpreadSlots(album, spread, side) {
+  const slotConfigs = side === "left" ? spread.leftSlots || [] : spread.rightSlots || [];
+  if (!slotConfigs.length) return "";
+
   const slots = [];
   const catalog = getStickerCatalog();
+  const total = slotConfigs.length;
 
-  for (let index = 0; index < 10; index += 1) {
-    const number = spread.start + offset + index;
+  slotConfigs.forEach((config, idx) => {
+    const number = config.number;
     const sticker = album.stickers[number];
-    if (!sticker) continue;
+    if (!sticker) return;
     const meta = getStickerMeta(number);
-    const isCover = number === 1;
-    const position = isCover ? { left: 50, top: 22 } : getSlotPosition(index, 10);
+    const isCover = config.layout === "cover" || number === 1;
+    const position = config.position || getDefaultSlotPosition(idx, total, isCover);
     const ownedClass = getStickerCopyTotal(sticker) > 0 ? "placed" : "";
     const coverClass = isCover ? "cover-sticker" : "";
     const displayImage = getStickerCopyTotal(sticker) > 0 ? catalog[number] : "";
@@ -824,27 +890,38 @@ function renderSpreadSlots(album, spread, offset) {
         <small>${number}</small>
       </button>
     `);
-  }
+  });
 
   return slots.join("");
 }
 
-function getSlotPosition(index, total) {
-  if (total === 10) {
-    const column = index % 2;
-    const row = Math.floor(index / 2);
-    return {
-      left: column === 0 ? 29 : 71,
-      top: 27 + row * 15,
-    };
+function getDefaultSlotPosition(index, total, isCover) {
+  if (total === 1) {
+    return isCover ? { left: 50, top: 38 } : { left: 50, top: 50 };
   }
-  const columns = total > 12 ? 5 : total > 6 ? 2 : 4;
-  const rows = Math.ceil(total / columns);
-  const column = index % columns;
-  const row = Math.floor(index / columns);
+  if (total === 2) {
+    return { left: 50, top: 32 + index * 36 };
+  }
+  if (total === 3) {
+    return { left: 50, top: 24 + index * 26 };
+  }
+  if (total === 4) {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    return { left: col === 0 ? 30 : 70, top: row === 0 ? 32 : 68 };
+  }
+  if (total === 10) {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    return { left: col === 0 ? 29 : 71, top: 27 + row * 15 };
+  }
+  const cols = 2;
+  const rows = Math.ceil(total / cols);
+  const col = index % cols;
+  const row = Math.floor(index / cols);
   return {
-    left: 8 + (column * 84) / Math.max(columns - 1, 1),
-    top: 8 + (row * 84) / Math.max(rows - 1, 1),
+    left: col === 0 ? 30 : 70,
+    top: 22 + row * (74 / Math.max(rows - 1, 1)),
   };
 }
 
