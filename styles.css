@@ -2263,6 +2263,36 @@ dialog::backdrop {
   grid-template-columns: 1fr;
 }
 
+.friend-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.friend-search-row {
+  margin-bottom: 12px;
+}
+
+.friend-search-row input {
+  width: 100%;
+}
+
+.danger-action {
+  border: 1px solid rgba(248, 113, 113, 0.32);
+  border-radius: var(--radius-sm);
+  background: rgba(248, 113, 113, 0.08);
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 7px 12px;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.danger-action:hover {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
 .guest-welcome a.primary-action,
 .guest-welcome a.secondary-action {
   text-decoration: none;

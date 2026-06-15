@@ -191,6 +191,7 @@ const els = {
   miniChatInput: document.querySelector("#miniChatInput"),
   friendList: document.querySelector("#friendList"),
   suggestionList: document.querySelector("#suggestionList"),
+  friendSearchInput: document.querySelector("#friendSearchInput"),
   jumpButtons: document.querySelectorAll("[data-jump-view]"),
   messengerContactList: document.querySelector("#messengerContactList"),
   messengerDock: document.querySelector("#messengerDock"),
@@ -1207,30 +1208,73 @@ function renderFriends() {
                 <strong>${escapeHtml(friend.name)}</strong>
                 <small>${escapeHtml(friend.city)} - ${escapeHtml(friend.status)} - ${friend.trades} trade${friend.trades === 1 ? "" : "s"}</small>
               </div>
-              <button type="button" data-chat-friend="${friend.id}">Message</button>
-            </article>
-          `,
-        )
-        .join("")
-    : '<p class="form-status">No friends yet. Add collectors from the suggestions on the right.</p>';
-
-  els.suggestionList.innerHTML = state.suggestions.length
-    ? state.suggestions
-        .map(
-          (person) => `
-            <article class="friend-card">
-              <span class="avatar small">${escapeHtml(person.initials)}</span>
-              <div>
-                <strong>${escapeHtml(person.name)}</strong>
-                <small>${escapeHtml(person.city)} - ${escapeHtml(person.reason)}</small>
+              <div class="friend-card-actions">
+                <button type="button" data-chat-friend="${friend.id}">Message</button>
+                <button class="danger-action" type="button" data-remove-friend="${friend.id}" aria-label="Remove ${escapeHtml(friend.name)}">Remove</button>
               </div>
-              <button type="button" data-add-friend="${person.id}">Add</button>
             </article>
           `,
         )
         .join("")
-    : '<p class="form-status">No suggestions available yet.</p>';
+    : '<p class="form-status">No friends yet. Search for collectors on the right and add them.</p>';
+
+  renderFriendSearchResults(els.friendSearchInput?.value || "");
   renderMessengerContacts();
+}
+
+function getRegisteredUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function renderFriendSearchResults(rawQuery) {
+  if (!els.suggestionList) return;
+  const query = String(rawQuery || "").trim().toLowerCase();
+  const me = getSessionUser();
+  const friendIds = new Set(state.friends.map((friend) => friend.id));
+  const candidates = getRegisteredUsers().filter((person) => {
+    if (!person || person.active === false) return false;
+    if (person.role === "admin") return false;
+    if (me && person.id === me.id) return false;
+    if (friendIds.has(person.id)) return false;
+    return true;
+  });
+
+  const matches = query.length === 0
+    ? candidates
+    : candidates.filter(
+        (person) =>
+          (person.name || "").toLowerCase().includes(query) ||
+          (person.email || "").toLowerCase().includes(query) ||
+          (person.city || "").toLowerCase().includes(query),
+      );
+
+  if (matches.length === 0) {
+    els.suggestionList.innerHTML = query.length
+      ? '<p class="form-status">No collectors match that search.</p>'
+      : '<p class="form-status">No other collectors registered yet.</p>';
+    return;
+  }
+
+  els.suggestionList.innerHTML = matches
+    .slice(0, 20)
+    .map((person) => {
+      const initials = getInitials(person.name);
+      return `
+        <article class="friend-card">
+          <span class="avatar small">${escapeHtml(initials)}</span>
+          <div>
+            <strong>${escapeHtml(person.name)}</strong>
+            <small>${escapeHtml(person.city || "Local")} - ${escapeHtml(person.email)}</small>
+          </div>
+          <button type="button" data-add-friend="${person.id}">Add</button>
+        </article>
+      `;
+    })
+    .join("");
 }
 
 function getActiveChatPerson() {
@@ -1294,33 +1338,44 @@ function closeMessenger() {
 }
 
 function addFriend(id) {
-  const person = state.suggestions.find((suggestion) => suggestion.id === id);
-  if (!person) return;
+  const me = getSessionUser();
+  if (!me) return;
+  if (state.friends.some((friend) => friend.id === id)) return;
+
+  let candidate = state.suggestions.find((suggestion) => suggestion.id === id);
+  if (!candidate) {
+    candidate = getRegisteredUsers().find((person) => person.id === id);
+  }
+  if (!candidate) return;
 
   state.suggestions = state.suggestions.filter((suggestion) => suggestion.id !== id);
   state.friends.push({
-    id: person.id,
-    name: person.name,
-    city: person.city,
-    initials: person.initials,
+    id: candidate.id,
+    name: candidate.name,
+    city: candidate.city || "Local",
+    initials: getInitials(candidate.name),
     status: "Friend",
     trades: 0,
   });
-  activeChatPersonId = person.id;
-  state.posts.unshift({
-    id: crypto.randomUUID(),
-    author: "StickerSwap",
-    city: person.city,
-    text: `You added ${person.name}. Start a chat to compare albums and find a trade.`,
-    likes: 0,
-    comments: 0,
-    local: person.city === "Montreal",
-  });
+  activeChatPersonId = candidate.id;
 
   saveState();
   renderFriends();
-  renderPosts();
-  openMessenger(person.id);
+  openMessenger(candidate.id);
+}
+
+function removeFriend(id) {
+  const friend = state.friends.find((item) => item.id === id);
+  if (!friend) return;
+  if (!confirm(`Remove ${friend.name} from your friends?`)) return;
+
+  state.friends = state.friends.filter((item) => item.id !== id);
+  if (activeChatPersonId === id) {
+    activeChatPersonId = state.friends[0]?.id || null;
+  }
+  saveState();
+  renderFriends();
+  renderMessages();
 }
 
 function sendChatMessage(text) {
@@ -1518,6 +1573,11 @@ els.miniChatForm.addEventListener("submit", (event) => {
 });
 
 els.friendList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest("[data-remove-friend]");
+  if (removeButton) {
+    removeFriend(removeButton.dataset.removeFriend);
+    return;
+  }
   const chatButton = event.target.closest("[data-chat-friend]");
   if (!chatButton) return;
   openMessenger(chatButton.dataset.chatFriend);
@@ -1527,6 +1587,10 @@ els.suggestionList.addEventListener("click", (event) => {
   const addButton = event.target.closest("[data-add-friend]");
   if (!addButton) return;
   addFriend(addButton.dataset.addFriend);
+});
+
+els.friendSearchInput?.addEventListener("input", (event) => {
+  renderFriendSearchResults(event.target.value);
 });
 
 els.messengerContactList.addEventListener("click", (event) => {
